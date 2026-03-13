@@ -1,1 +1,737 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEURO: Academy PRO - Do ZERO ao seu primeiro RPG</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-csharp.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        neuro: {
+                            bg: '#0f0f12',
+                            card: '#1a1a1f',
+                            accent: '#00d4aa',
+                            'accent-hover': '#00b894',
+                            text: '#f0f0f5',
+                            muted: '#a0a0b0',
+                            border: '#2a2a35'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #0f0f12; color: #f0f0f5; }
+        .code-block { font-family: 'JetBrains Mono', monospace; }
+        .gradient-text { background: linear-gradient(135deg, #00d4aa 0%, #00b894 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .hover-lift { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .hover-lift:hover { transform: translateY(-2px); box-shadow: 0 10px 40px -10px rgba(0, 212, 170, 0.1); }
+        .lesson-content h2 { font-size: 1.5rem; font-weight: 600; margin-top: 2rem; margin-bottom: 1rem; color: #00d4aa; }
+        .lesson-content p { margin-bottom: 1rem; line-height: 1.7; color: #a0a0b0; }
+        .lesson-content ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1rem; color: #a0a0b0; }
+        .lesson-content img { border-radius: 0.5rem; margin: 1.5rem 0; border: 1px solid #2a2a35; }
+        .callout { border-left: 3px solid #00d4aa; background: rgba(0, 212, 170, 0.05); padding: 1rem; margin: 1.5rem 0; border-radius: 0 0.5rem 0.5rem 0; }
+        .quiz-option { cursor: pointer; transition: all 0.2s; border: 1px solid #2a2a35; }
+        .quiz-option:hover { border-color: #00d4aa; background: rgba(0, 212, 170, 0.05); }
+        .quiz-option.selected { border-color: #00d4aa; background: rgba(0, 212, 170, 0.1); }
+        .quiz-option.correct { border-color: #00d4aa; background: rgba(0, 212, 170, 0.2); }
+        .quiz-option.wrong { border-color: #e74c3c; background: rgba(231, 76, 60, 0.1); }
+    </style>
+</head>
+<body class="antialiased">
 
+    <!-- NAVEGAÇÃO -->
+    <nav class="fixed top-0 w-full bg-neuro-bg/95 backdrop-blur-md border-b border-neuro-border z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 bg-gradient-to-br from-neuro-accent to-neuro-accent-hover rounded-lg flex items-center justify-center font-bold text-neuro-bg">N</div>
+                    <span class="font-semibold text-lg tracking-tight">NEURO: Academy <span class="text-neuro-accent">PRO</span></span>
+                </div>
+                <div class="hidden md:flex items-center gap-8">
+                    <a href="#curso" class="text-sm text-neuro-muted hover:text-neuro-text transition">Curso</a>
+                    <a href="#precos" class="text-sm text-neuro-muted hover:text-neuro-text transition">Preços</a>
+                    <button onclick="openAuthModal('login')" class="text-sm text-neuro-muted hover:text-neuro-text transition">Entrar</button>
+                    <button onclick="openAuthModal('register')" class="bg-neuro-accent hover:bg-neuro-accent-hover text-neuro-bg px-4 py-2 rounded-lg text-sm font-medium transition">Começar agora</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- LANDING PAGE -->
+    <div id="landing-page">
+        <!-- HERO -->
+        <section class="pt-32 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+            <div class="text-center max-w-4xl mx-auto">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-neuro-accent/10 border border-neuro-accent/20 text-neuro-accent text-xs font-medium mb-6">
+                    <span class="w-2 h-2 rounded-full bg-neuro-accent animate-pulse"></span>
+                    Turma inaugural - vagas limitadas
+                </div>
+                <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-6">
+                    Do <span class="gradient-text">ZERO</span> ao seu primeiro <br>
+                    RPG com Unity
+                </h1>
+                <p class="text-lg text-neuro-muted mb-8 max-w-2xl mx-auto leading-relaxed">
+                    Aprenda a criar jogos no universo NEURO: Verse. Do primeiro código à publicação, 
+                    com aulas práticas, projetos revisados e mentoria de quem já construiu o SANGUE DE TITÃ.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+                    <button onclick="scrollToPricing()" class="bg-neuro-accent hover:bg-neuro-accent-hover text-neuro-bg px-8 py-4 rounded-xl font-semibold text-lg transition hover-lift">
+                        Ver planos e preços
+                    </button>
+                    <button onclick="openPreview()" class="border border-neuro-border hover:border-neuro-accent text-neuro-text px-8 py-4 rounded-xl font-semibold text-lg transition">
+                        Ver aula de demonstração
+                    </button>
+                </div>
+                <div class="flex items-center justify-center gap-8 text-sm text-neuro-muted">
+                    <div class="flex items-center gap-2">
+                        <svg class="w-5 h-5 text-neuro-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        30 aulas práticas
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <svg class="w-5 h-5 text-neuro-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        Projetos reais
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <svg class="w-5 h-5 text-neuro-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        Certificado reconhecido
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CURSO -->
+        <section id="curso" class="py-20 bg-neuro-card/30">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl font-bold mb-4">O que você vai construir</h2>
+                    <p class="text-neuro-muted max-w-2xl mx-auto">
+                        Três módulos progressivos. Do primeiro sprite ao RPG completo publicado.
+                    </p>
+                </div>
+                
+                <div class="grid md:grid-cols-3 gap-8">
+                    <!-- Módulo 1 -->
+                    <div class="bg-neuro-card border border-neuro-border rounded-2xl p-6 hover-lift">
+                        <div class="w-12 h-12 bg-neuro-accent/10 rounded-xl flex items-center justify-center mb-4">
+                            <span class="text-neuro-accent font-bold text-xl">01</span>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2">Fundamentos</h3>
+                        <p class="text-neuro-muted text-sm mb-4">Interface Unity, C# básico, sprites, animação 2D e movimentação.</p>
+                        <ul class="space-y-2 text-sm text-neuro-muted">
+                            <li class="flex items-center gap-2">
+                                <span class="w-1.5 h-1.5 rounded-full bg-neuro-accent"></span>
+                                10 aulas teórico-práticas
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <span class="w-1.5 h-1.5 rounded-full bg-neuro-accent"></span>
+                                Projeto: Cena explorável
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Módulo 2 -->
+                    <div class="bg-neuro-card border border-neuro-border rounded-2xl p-6 hover-lift">
+                        <div class="w-12 h-12 bg-neuro-accent/10 rounded-xl flex items-center justify-center mb-4">
+                            <span class="text-neuro-accent font-bold text-xl">02</span>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2">Mecânicas de RPG</h3>
+                        <p class="text-neuro-muted text-sm mb-4">Batalha por turnos, inventário, quests, save/load e IA de inimigos.</p>
+                        <ul class="space-y-2 text-sm text-neuro-muted">
+                            <li class="flex items-center gap-2">
+                                <span class="w-1.5 h-1.5 rounded-full bg-neuro-accent"></span>
+                                10 aulas avançadas
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <span class="w-1.5 h-1.5 rounded-full bg-neuro-accent"></span>
+                                Projeto: Demo de batalha
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Módulo 3 -->
+                    <div class="bg-neuro-card border border-neuro-border rounded-2xl p-6 hover-lift">
+                        <div class="w-12 h-12 bg-neuro-accent/10 rounded-xl flex items-center justify-center mb-4">
+                            <span class="text-neuro-accent font-bold text-xl">03</span>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2">Publicação</h3>
+                        <p class="text-neuro-muted text-sm mb-4">Polish, otimização, builds WebGL/Android e marketing indie.</p>
+                        <ul class="space-y-2 text-sm text-neuro-muted">
+                            <li class="flex items-center gap-2">
+                                <span class="w-1.5 h-1.5 rounded-full bg-neuro-accent"></span>
+                                10 aulas profissionais
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <span class="w-1.5 h-1.5 rounded-full bg-neuro-accent"></span>
+                                Projeto: RPG publicado
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PREÇOS -->
+        <section id="precos" class="py-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl font-bold mb-4">Invista na sua carreira</h2>
+                    <p class="text-neuro-muted">Acesso vitalício às aulas enquanto mantiver a assinatura ativa.</p>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                    <!-- Explorer -->
+                    <div class="bg-neuro-card border border-neuro-border rounded-2xl p-8 relative">
+                        <h3 class="text-xl font-semibold mb-2">Explorer</h3>
+                        <p class="text-neuro-muted text-sm mb-6">Para quem quer aprender no próprio ritmo</p>
+                        <div class="mb-6">
+                            <span class="text-4xl font-bold">R$ 19</span>
+                            <span class="text-neuro-muted">/mês</span>
+                        </div>
+                        <ul class="space-y-3 mb-8 text-sm text-neuro-muted">
+                            <li class="flex items-center gap-2">✓ Acesso a todas as 30 aulas</li>
+                            <li class="flex items-center gap-2">✓ Projetos para portfolio pessoal</li>
+                            <li class="flex items-center gap-2">✓ Certificado de conclusão</li>
+                            <li class="flex items-center gap-2">✓ Comunidade Discord</li>
+                        </ul>
+                        <button onclick="startCheckout('explorer')" class="w-full py-3 border border-neuro-border hover:border-neuro-accent rounded-lg font-medium transition text-neuro-text hover:text-neuro-accent">
+                            Escolher Explorer
+                        </button>
+                        <p class="text-xs text-neuro-muted mt-3 text-center">ou R$ 205/ano (10% off)</p>
+                    </div>
+
+                    <!-- Builder (Popular) -->
+                    <div class="bg-neuro-card border-2 border-neuro-accent rounded-2xl p-8 relative transform scale-105">
+                        <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-neuro-accent text-neuro-bg text-xs font-bold px-3 py-1 rounded-full">
+                            MAIS POPULAR
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2">Builder</h3>
+                        <p class="text-neuro-muted text-sm mb-6">Para quem quer feedback e visibilidade</p>
+                        <div class="mb-6">
+                            <span class="text-4xl font-bold text-neuro-accent">R$ 39</span>
+                            <span class="text-neuro-muted">/mês</span>
+                        </div>
+                        <ul class="space-y-3 mb-8 text-sm text-neuro-muted">
+                            <li class="flex items-center gap-2">✓ Tudo do Explorer</li>
+                            <li class="flex items-center gap-2 text-neuro-text font-medium">✓ Revisão de código por instrutores</li>
+                            <li class="flex items-center gap-2 text-neuro-text font-medium">✓ Portfolio público na NEURO</li>
+                            <li class="flex items-center gap-2 text-neuro-text font-medium">✓ Acesso a engines alternativas</li>
+                        </ul>
+                        <button onclick="startCheckout('builder')" class="w-full py-3 bg-neuro-accent hover:bg-neuro-accent-hover text-neuro-bg rounded-lg font-semibold transition">
+                            Escolher Builder
+                        </button>
+                        <p class="text-xs text-neuro-muted mt-3 text-center">ou R$ 421/ano (10% off)</p>
+                    </div>
+
+                    <!-- Creator -->
+                    <div class="bg-neuro-card border border-neuro-border rounded-2xl p-8 relative">
+                        <h3 class="text-xl font-semibold mb-2">Creator</h3>
+                        <p class="text-neuro-muted text-sm mb-6">Para quem quer acelerar resultados</p>
+                        <div class="mb-6">
+                            <span class="text-4xl font-bold">R$ 79</span>
+                            <span class="text-neuro-muted">/mês</span>
+                        </div>
+                        <ul class="space-y-3 mb-8 text-sm text-neuro-muted">
+                            <li class="flex items-center gap-2">✓ Tudo do Builder</li>
+                            <li class="flex items-center gap-2 text-neuro-text font-medium">✓ Mentoria 1:1 (30min/mês)</li>
+                            <li class="flex items-center gap-2 text-neuro-text font-medium">✓ Prioridade em dúvidas</li>
+                            <li class="flex items-center gap-2 text-neuro-text font-medium">✓ Acesso antecipado a novos módulos</li>
+                        </ul>
+                        <button onclick="startCheckout('creator')" class="w-full py-3 border border-neuro-border hover:border-neuro-accent rounded-lg font-medium transition text-neuro-text hover:text-neuro-accent">
+                            Escolher Creator
+                        </button>
+                        <p class="text-xs text-neuro-muted mt-3 text-center">ou R$ 853/ano (10% off)</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- APP AREA (escondida até login) -->
+    <div id="app-area" class="hidden min-h-screen pt-16">
+        <div class="flex h-[calc(100vh-4rem)]">
+            <!-- Sidebar -->
+            <aside class="w-64 bg-neuro-card border-r border-neuro-border hidden lg:block">
+                <div class="p-4">
+                    <div class="mb-6">
+                        <span class="text-xs font-semibold text-neuro-muted uppercase tracking-wider">Seu progresso</span>
+                        <div class="mt-2 h-2 bg-neuro-bg rounded-full overflow-hidden">
+                            <div id="progress-bar" class="h-full bg-neuro-accent w-0 transition-all duration-500"></div>
+                        </div>
+                        <span id="progress-text" class="text-xs text-neuro-muted mt-1">0% completo</span>
+                    </div>
+                    
+                    <nav class="space-y-1">
+                        <button onclick="showModule('modulo-1')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-neuro-bg transition text-sm font-medium text-neuro-text">
+                            Módulo 1: Fundamentos
+                        </button>
+                        <div id="lessons-mod-1" class="ml-4 space-y-1 hidden">
+                            <!-- Aulas geradas via JS -->
+                        </div>
+                        
+                        <button onclick="showModule('modulo-2')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-neuro-bg transition text-sm font-medium text-neuro-muted" disabled>
+                            Módulo 2: Mecânicas (bloqueado)
+                        </button>
+                        
+                        <button onclick="showModule('modulo-3')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-neuro-bg transition text-sm font-medium text-neuro-muted" disabled>
+                            Módulo 3: Publicação (bloqueado)
+                        </button>
+                    </nav>
+                </div>
+            </aside>
+
+            <!-- Conteúdo principal -->
+            <main class="flex-1 overflow-y-auto bg-neuro-bg">
+                <div id="lesson-container" class="max-w-4xl mx-auto p-8">
+                    <!-- Aula renderizada aqui -->
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- MODAL DE AUTH -->
+    <div id="auth-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-neuro-card border border-neuro-border rounded-2xl p-8 max-w-md w-full relative">
+            <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-neuro-muted hover:text-neuro-text">✕</button>
+            
+            <div id="auth-login">
+                <h2 class="text-2xl font-bold mb-6">Entrar na Academy</h2>
+                <form onsubmit="handleLogin(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Email</label>
+                        <input type="email" id="login-email" required class="w-full bg-neuro-bg border border-neuro-border rounded-lg px-4 py-3 text-neuro-text focus:border-neuro-accent focus:outline-none transition">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Senha</label>
+                        <input type="password" id="login-password" required class="w-full bg-neuro-bg border border-neuro-border rounded-lg px-4 py-3 text-neuro-text focus:border-neuro-accent focus:outline-none transition">
+                    </div>
+                    <button type="submit" class="w-full bg-neuro-accent hover:bg-neuro-accent-hover text-neuro-bg py-3 rounded-lg font-semibold transition">
+                        Entrar
+                    </button>
+                </form>
+                <p class="mt-4 text-center text-sm text-neuro-muted">
+                    Não tem conta? <button onclick="toggleAuthMode()" class="text-neuro-accent hover:underline">Cadastre-se</button>
+                </p>
+            </div>
+
+            <div id="auth-register" class="hidden">
+                <h2 class="text-2xl font-bold mb-6">Criar conta</h2>
+                <form onsubmit="handleRegister(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Nome completo</label>
+                        <input type="text" id="reg-name" required class="w-full bg-neuro-bg border border-neuro-border rounded-lg px-4 py-3 text-neuro-text focus:border-neuro-accent focus:outline-none transition">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Email</label>
+                        <input type="email" id="reg-email" required class="w-full bg-neuro-bg border border-neuro-border rounded-lg px-4 py-3 text-neuro-text focus:border-neuro-accent focus:outline-none transition">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Senha (mínimo 6 caracteres)</label>
+                        <input type="password" id="reg-password" required minlength="6" class="w-full bg-neuro-bg border border-neuro-border rounded-lg px-4 py-3 text-neuro-text focus:border-neuro-accent focus:outline-none transition">
+                    </div>
+                    <button type="submit" class="w-full bg-neuro-accent hover:bg-neuro-accent-hover text-neuro-bg py-3 rounded-lg font-semibold transition">
+                        Criar conta gratuita
+                    </button>
+                </form>
+                <p class="mt-4 text-center text-sm text-neuro-muted">
+                    Já tem conta? <button onclick="toggleAuthMode()" class="text-neuro-accent hover:underline">Entrar</button>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE PAGAMENTO (MOCK) -->
+    <div id="payment-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-neuro-card border border-neuro-border rounded-2xl p-8 max-w-md w-full text-center">
+            <div class="w-16 h-16 bg-neuro-accent/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span class="text-3xl">💳</span>
+            </div>
+            <h3 class="text-xl font-bold mb-2">Pagamento via Pix</h3>
+            <p class="text-neuro-muted mb-6">Escaneie o QR Code para ativar seu plano <span id="selected-tier" class="text-neuro-accent font-semibold"></span></p>
+            
+            <div class="bg-white p-4 rounded-lg mb-6 inline-block">
+                <div class="w-48 h-48 bg-gray-200 flex items-center justify-center text-gray-400 text-xs">
+                    [QR CODE PLACEHOLDER]<br>
+                    (Integrar Mercado Pago aqui)
+                </div>
+            </div>
+            
+            <div class="space-y-2">
+                <button onclick="simulatePayment()" class="w-full bg-neuro-accent hover:bg-neuro-accent-hover text-neuro-bg py-3 rounded-lg font-semibold transition">
+                    Simular pagamento (teste)
+                </button>
+                <button onclick="closePaymentModal()" class="w-full border border-neuro-border hover:border-neuro-accent text-neuro-text py-3 rounded-lg transition">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== ESTADO GLOBAL =====
+        let currentUser = null;
+        let selectedTier = null;
+        
+        // ===== DADOS DAS AULAS (Template para você preencher) =====
+        const courseData = {
+            "modulo-1": {
+                title: "Fundamentos",
+                lessons: [
+                    {
+                        id: "aula-1",
+                        title: "Bem-vindo à NEURO: Academy",
+                        content: `
+## Bem-vindo à NEURO: Academy PRO
+
+Esta é a **Aula 1** do Módulo 1. Substitua este conteúdo pelo seu roteiro completo.
+
+### O que você vai aprender nesta aula:
+
+- Apresentação do curso e metodologia
+- Visão geral do universo NEURO: Verse
+- Configuração do ambiente de desenvolvimento
+
+### Conteúdo principal
+
+Aqui vai seu texto explicativo. Você pode usar:
+- **Negrito** para ênfase
+- *Itálico* para termos técnicos
+- Listas organizadas
+
+![Diagrama explicativo](https://via.placeholder.com/800x400/1a1a1f/00d4aa?text=Seu+Diagrama+Aqui)
+
+### Código de exemplo
+
+\`\`\`csharp
+using UnityEngine;
+
+public class PlayerMovement : MonoBehaviour 
+{
+    void Update() 
+    {
+        // Seu código aqui
+        float horizontal = Input.GetAxis("Horizontal");
+        Debug.Log("Movimento: " + horizontal);
+    }
+}
+\`\`\`
+
+<div class="callout">
+<strong>Dica profissional:</strong> Sempre mantenha seu código organizado com comentários claros.
+</div>
+                        `,
+                        quiz: [
+                            {
+                                question: "Qual engine principal utilizamos no curso?",
+                                options: ["Unreal Engine", "Unity", "Godot", "GameMaker"],
+                                correct: 1,
+                                explanation: "O curso foca em Unity 2D por ser a engine mais versátil para jogos indie no mercado brasileiro."
+                            },
+                            {
+                                question: "Qual linguagem de programação usamos?",
+                                options: ["Python", "JavaScript", "C#", "C++"],
+                                correct: 2,
+                                explanation: "Unity utiliza C# como linguagem principal para scripts."
+                            },
+                            {
+                                question: "O que é o NEURO: Verse?",
+                                options: ["Um motor de jogos", "Um universo de jogos interconectados", "Uma linguagem de programação", "Uma ferramenta de arte"],
+                                correct: 1,
+                                explanation: "NEURO: Verse é o universo compartilhado onde seus jogos existem, conectando-se a títulos como SANGUE DE TITÃ."
+                            }
+                        ]
+                    },
+                    {
+                        id: "aula-2",
+                        title: "Instalação e Interface do Unity",
+                        content: "<p>Conteúdo da aula 2...</p>",
+                        quiz: []
+                    }
+                    // Adicione mais aulas aqui
+                ]
+            }
+        };
+
+        // ===== FUNÇÕES DE UI =====
+        function openAuthModal(mode) {
+            document.getElementById('auth-modal').classList.remove('hidden');
+            if (mode === 'register') {
+                document.getElementById('auth-login').classList.add('hidden');
+                document.getElementById('auth-register').classList.remove('hidden');
+            } else {
+                document.getElementById('auth-login').classList.remove('hidden');
+                document.getElementById('auth-register').classList.add('hidden');
+            }
+        }
+
+        function closeAuthModal() {
+            document.getElementById('auth-modal').classList.add('hidden');
+        }
+
+        function toggleAuthMode() {
+            document.getElementById('auth-login').classList.toggle('hidden');
+            document.getElementById('auth-register').classList.toggle('hidden');
+        }
+
+        function scrollToPricing() {
+            document.getElementById('precos').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function openPreview() {
+            alert('Aula de demonstração será implementada na próxima parte');
+        }
+
+        // ===== AUTENTICAÇÃO (MOCK - substituir por Firebase) =====
+        function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            
+            // Simulação de login
+            currentUser = {
+                name: "Aluno Teste",
+                email: email,
+                tier: "builder",
+                completedLessons: [],
+                currentLesson: "aula-1"
+            };
+            
+            closeAuthModal();
+            showApp();
+        }
+
+        function handleRegister(e) {
+            e.preventDefault();
+            const name = document.getElementById('reg-name').value;
+            const email = document.getElementById('reg-email').value;
+            
+            // Simulação de registro
+            currentUser = {
+                name: name,
+                email: email,
+                tier: "free",
+                completedLessons: [],
+                currentLesson: null
+            };
+            
+            closeAuthModal();
+            alert('Conta criada! Escolha um plano para começar.');
+            scrollToPricing();
+        }
+
+        // ===== PAGAMENTO =====
+        function startCheckout(tier) {
+            if (!currentUser) {
+                openAuthModal('register');
+                return;
+            }
+            
+            selectedTier = tier;
+            document.getElementById('selected-tier').textContent = tier.toUpperCase();
+            document.getElementById('payment-modal').classList.remove('hidden');
+        }
+
+        function closePaymentModal() {
+            document.getElementById('payment-modal').classList.add('hidden');
+        }
+
+        function simulatePayment() {
+            // Simulação de pagamento aprovado
+            currentUser.tier = selectedTier;
+            closePaymentModal();
+            showApp();
+            alert(`Pagamento simulado! Bem-vindo ao plano ${selectedTier.toUpperCase()}.`);
+        }
+
+        // ===== APP PRINCIPAL =====
+        function showApp() {
+            document.getElementById('landing-page').classList.add('hidden');
+            document.getElementById('app-area').classList.remove('hidden');
+            
+            // Renderiza sidebar
+            renderSidebar();
+            
+            // Mostra primeira aula ou atual
+            const lessonId = currentUser.currentLesson || 'aula-1';
+            loadLesson(lessonId);
+        }
+
+        function renderSidebar() {
+            const container = document.getElementById('lessons-mod-1');
+            const modulo = courseData['modulo-1'];
+            
+            container.innerHTML = modulo.lessons.map((lesson, index) => `
+                <button onclick="loadLesson('${lesson.id}')" 
+                        class="w-full text-left px-3 py-2 rounded text-sm ${currentUser.completedLessons.includes(lesson.id) ? 'text-neuro-accent' : 'text-neuro-muted'} hover:text-neuro-text transition">
+                    ${index + 1}. ${lesson.title}
+                </button>
+            `).join('');
+            
+            container.classList.remove('hidden');
+        }
+
+        function loadLesson(lessonId) {
+            const lesson = courseData['modulo-1'].lessons.find(l => l.id === lessonId);
+            if (!lesson) return;
+            
+            const container = document.getElementById('lesson-container');
+            
+            // Renderiza conteúdo Markdown
+            const htmlContent = marked.parse(lesson.content);
+            
+            // Renderiza quiz se existir
+            let quizHtml = '';
+            if (lesson.quiz && lesson.quiz.length > 0) {
+                quizHtml = `
+                    <div class="mt-12 pt-8 border-t border-neuro-border">
+                        <h3 class="text-xl font-semibold mb-6">Verificação de aprendizado</h3>
+                        <div id="quiz-container" class="space-y-6">
+                            ${lesson.quiz.map((q, idx) => `
+                                <div class="quiz-question" data-question="${idx}">
+                                    <p class="font-medium mb-3">${idx + 1}. ${q.question}</p>
+                                    <div class="space-y-2">
+                                        ${q.options.map((opt, optIdx) => `
+                                            <div class="quiz-option p-3 rounded-lg border border-neuro-border cursor-pointer" 
+                                                 onclick="selectOption(${idx}, ${optIdx}, ${q.correct})">
+                                                ${String.fromCharCode(97 + optIdx)}) ${opt}
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                    <div class="explanation hidden mt-3 p-3 rounded-lg bg-neuro-card text-sm"></div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <button onclick="checkQuiz()" class="mt-6 bg-neuro-accent hover:bg-neuro-accent-hover text-neuro-bg px-6 py-3 rounded-lg font-semibold transition">
+                            Verificar respostas
+                        </button>
+                    </div>
+                `;
+            }
+            
+            container.innerHTML = `
+                <article class="lesson-content">
+                    <header class="mb-8">
+                        <span class="text-neuro-accent text-sm font-medium">Módulo 1 • Aula ${lesson.id.split('-')[1]}</span>
+                        <h1 class="text-3xl font-bold mt-2 mb-4">${lesson.title}</h1>
+                        <div class="flex items-center gap-4 text-sm text-neuro-muted">
+                            <span>15-20 minutos de leitura</span>
+                            <span>•</span>
+                            <span>1 exercício prático</span>
+                        </div>
+                    </header>
+                    
+                    ${htmlContent}
+                    ${quizHtml}
+                    
+                    <div class="mt-12 flex justify-between items-center pt-8 border-t border-neuro-border">
+                        <button onclick="prevLesson()" class="text-neuro-muted hover:text-neuro-text transition">← Aula anterior</button>
+                        <button onclick="completeLesson('${lessonId}')" class="bg-neuro-accent hover:bg-neuro-accent-hover text-neuro-bg px-6 py-3 rounded-lg font-semibold transition">
+                            Marcar como concluída →
+                        </button>
+                    </div>
+                </article>
+            `;
+            
+            // Aplica syntax highlight
+            Prism.highlightAll();
+        }
+
+        // ===== QUIZ =====
+        let selectedAnswers = {};
+
+        function selectOption(questionIdx, optionIdx, correctIdx) {
+            const questionEl = document.querySelectorAll('.quiz-question')[questionIdx];
+            const options = questionEl.querySelectorAll('.quiz-option');
+            
+            // Remove seleção anterior
+            options.forEach(opt => opt.classList.remove('selected'));
+            
+            // Adiciona seleção atual
+            options[optionIdx].classList.add('selected');
+            selectedAnswers[questionIdx] = { selected: optionIdx, correct: correctIdx };
+        }
+
+        function checkQuiz() {
+            const questions = document.querySelectorAll('.quiz-question');
+            let correct = 0;
+            
+            questions.forEach((q, idx) => {
+                const answer = selectedAnswers[idx];
+                const options = q.querySelectorAll('.quiz-option');
+                const explanation = q.querySelector('.explanation');
+                const questionData = courseData['modulo-1'].lessons.find(l => l.id === 'aula-1').quiz[idx];
+                
+                if (!answer) return;
+                
+                options[answer.selected].classList.remove('selected');
+                
+                if (answer.selected === answer.correct) {
+                    options[answer.selected].classList.add('correct');
+                    explanation.className = 'explanation mt-3 p-3 rounded-lg bg-neuro-accent/10 text-neuro-accent text-sm';
+                    explanation.textContent = '✓ Correto! ' + questionData.explanation;
+                    correct++;
+                } else {
+                    options[answer.selected].classList.add('wrong');
+                    options[answer.correct].classList.add('correct');
+                    explanation.className = 'explanation mt-3 p-3 rounded-lg bg-red-500/10 text-red-400 text-sm';
+                    explanation.textContent = '✗ ' + questionData.explanation;
+                }
+                
+                explanation.classList.remove('hidden');
+            });
+            
+            if (correct >= 2) {
+                setTimeout(() => alert(`Você acertou ${correct}/3! Pode prosseguir para a próxima aula.`), 100);
+            } else {
+                alert(`Você acertou ${correct}/3. Recomendamos revisar o conteúdo antes de continuar.`);
+            }
+        }
+
+        function completeLesson(lessonId) {
+            if (!currentUser.completedLessons.includes(lessonId)) {
+                currentUser.completedLessons.push(lessonId);
+                updateProgress();
+            }
+            alert('Aula concluída! Progresso salvo.');
+        }
+
+        function updateProgress() {
+            const total = 30; // Total de aulas
+            const completed = currentUser.completedLessons.length;
+            const percent = Math.round((completed / total) * 100);
+            
+            document.getElementById('progress-bar').style.width = percent + '%';
+            document.getElementById('progress-text').textContent = percent + '% completo';
+        }
+
+        function prevLesson() {
+            alert('Navegação entre aulas será implementada na próxima parte');
+        }
+
+        function showModule(modId) {
+            // Implementar troca de módulo
+        }
+
+        // ===== INICIALIZAÇÃO =====
+        document.addEventListener('DOMContentLoaded', () => {
+            // Verifica se usuário está logado (simulação)
+            // Na versão real: firebase.auth().onAuthStateChanged()
+        });
+    </script>
+</body>
+</html>
