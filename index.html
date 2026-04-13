@@ -3,735 +3,1105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEURO: Academy PRO - Do ZERO ao seu primeiro RPG</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-csharp.min.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-    
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        neuro: {
-                            bg: '#0f0f12',
-                            card: '#1a1a1f',
-                            accent: '#00d4aa',
-                            'accent-hover': '#00b894',
-                            text: '#f0f0f5',
-                            muted: '#a0a0b0',
-                            border: '#2a2a35'
-                        }
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        mono: ['JetBrains Mono', 'monospace']
-                    }
-                }
-            }
-        }
-    </script>
-    
+    <title>Siqueira JR - Rhythm Game</title>
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #0f0f12; color: #f0f0f5; }
-        .code-block { font-family: 'JetBrains Mono', monospace; }
-        .gradient-text { background: linear-gradient(135deg, #00d4aa 0%, #00b894 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .hover-lift { transition: transform 0.2s ease, box-shadow 0.2s ease; }
-        .hover-lift:hover { transform: translateY(-2px); box-shadow: 0 10px 40px -10px rgba(0, 212, 170, 0.1); }
-        .lesson-content h2 { font-size: 1.5rem; font-weight: 600; margin-top: 2rem; margin-bottom: 1rem; color: #00d4aa; }
-        .lesson-content p { margin-bottom: 1rem; line-height: 1.7; color: #a0a0b0; }
-        .lesson-content ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1rem; color: #a0a0b0; }
-        .lesson-content img { border-radius: 0.5rem; margin: 1.5rem 0; border: 1px solid #2a2a35; }
-        .callout { border-left: 3px solid #00d4aa; background: rgba(0, 212, 170, 0.05); padding: 1rem; margin: 1.5rem 0; border-radius: 0 0.5rem 0.5rem 0; }
-        .quiz-option { cursor: pointer; transition: all 0.2s; border: 1px solid #2a2a35; }
-        .quiz-option:hover { border-color: #00d4aa; background: rgba(0, 212, 170, 0.05); }
-        .quiz-option.selected { border-color: #00d4aa; background: rgba(0, 212, 170, 0.1); }
-        .quiz-option.correct { border-color: #00d4aa; background: rgba(0, 212, 170, 0.2); }
-        .quiz-option.wrong { border-color: #e74c3c; background: rgba(231, 76, 60, 0.1); }
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #0a0a0f;
+            color: #fff;
+            font-family: 'Rajdhani', sans-serif;
+            overflow: hidden;
+            user-select: none;
+        }
+        
+        #gameContainer {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(ellipse at center, #1a0a2e 0%, #0a0a0f 70%);
+            position: relative;
+        }
+        
+        /* Background particles */
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #00d4ff;
+            border-radius: 50%;
+            opacity: 0.6;
+            animation: float 10s infinite ease-in-out;
+            pointer-events: none;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0) translateX(0); opacity: 0; }
+            10% { opacity: 0.6; }
+            90% { opacity: 0.6; }
+            100% { transform: translateY(-100vh) translateX(50px); opacity: 0; }
+        }
+        
+        /* Main game area */
+        #playfield {
+            width: 800px;
+            height: 600px;
+            position: relative;
+            background: radial-gradient(ellipse at center, rgba(20, 10, 40, 0.8) 0%, transparent 70%);
+            border-radius: 20px;
+            box-shadow: 0 0 100px rgba(138, 43, 226, 0.3);
+        }
+        
+        /* PUMP-style receptor buttons (5 panels) */
+        .receptor {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            font-weight: 900;
+            transition: all 0.05s;
+            cursor: pointer;
+            z-index: 10;
+        }
+        
+        .receptor::before {
+            content: '';
+            position: absolute;
+            inset: -5px;
+            border-radius: 20px;
+            opacity: 0;
+            transition: opacity 0.1s;
+        }
+        
+        .receptor.active {
+            transform: scale(0.9);
+            filter: brightness(1.5);
+        }
+        
+        .receptor.active::before {
+            opacity: 1;
+            animation: pulse 0.3s ease-out;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
+        
+        /* PUMP layout: UL, UR, C, DL, DR */
+        #receptor-UL { 
+            top: 50px; 
+            left: 200px; 
+            background: linear-gradient(135deg, #ff006e, #ff4d9e);
+            box-shadow: 0 0 30px #ff006e, inset 0 0 20px rgba(255,255,255,0.2);
+            transform: rotate(-45deg);
+        }
+        #receptor-UL::before { border: 3px solid #ff006e; }
+        #receptor-UL span { transform: rotate(45deg); }
+        
+        #receptor-UR { 
+            top: 50px; 
+            right: 200px; 
+            background: linear-gradient(135deg, #00d4ff, #4de8ff);
+            box-shadow: 0 0 30px #00d4ff, inset 0 0 20px rgba(255,255,255,0.2);
+            transform: rotate(45deg);
+        }
+        #receptor-UR::before { border: 3px solid #00d4ff; }
+        #receptor-UR span { transform: rotate(-45deg); }
+        
+        #receptor-C { 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            box-shadow: 0 0 40px #ffd700, inset 0 0 20px rgba(255,255,255,0.3);
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+        }
+        #receptor-C::before { border: 3px solid #ffd700; border-radius: 50%; }
+        
+        #receptor-DL { 
+            bottom: 50px; 
+            left: 200px; 
+            background: linear-gradient(135deg, #8b5cf6, #b794f6);
+            box-shadow: 0 0 30px #8b5cf6, inset 0 0 20px rgba(255,255,255,0.2);
+            transform: rotate(45deg);
+        }
+        #receptor-DL::before { border: 3px solid #8b5cf6; }
+        #receptor-DL span { transform: rotate(-45deg); }
+        
+        #receptor-DR { 
+            bottom: 50px; 
+            right: 200px; 
+            background: linear-gradient(135deg, #10b981, #34d399);
+            box-shadow: 0 0 30px #10b981, inset 0 0 20px rgba(255,255,255,0.2);
+            transform: rotate(-45deg);
+        }
+        #receptor-DR::before { border: 3px solid #10b981; }
+        #receptor-DR span { transform: rotate(45deg); }
+        
+        /* osu! style approach circles */
+        .approach-circle {
+            position: absolute;
+            border: 4px solid;
+            border-radius: 15px;
+            opacity: 0.8;
+            pointer-events: none;
+            animation: approach 1s linear forwards;
+        }
+        
+        @keyframes approach {
+            0% { transform: scale(2); opacity: 0.3; }
+            100% { transform: scale(1); opacity: 0; }
+        }
+        
+        .approach-circle.center {
+            border-radius: 50%;
+        }
+        
+        /* Notes */
+        .note {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 900;
+            z-index: 5;
+            box-shadow: 0 0 20px currentColor;
+        }
+        
+        .note.center {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+        }
+        
+        .note-UL { 
+            background: linear-gradient(135deg, #ff006e, #ff4d9e);
+            color: #ff006e;
+            left: 200px;
+        }
+        .note-UR { 
+            background: linear-gradient(135deg, #00d4ff, #4de8ff);
+            color: #00d4ff;
+            right: 200px;
+        }
+        .note-C { 
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            color: #ffd700;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .note-DL { 
+            background: linear-gradient(135deg, #8b5cf6, #b794f6);
+            color: #8b5cf6;
+            left: 200px;
+        }
+        .note-DR { 
+            background: linear-gradient(135deg, #10b981, #34d399);
+            color: #10b981;
+            right: 200px;
+        }
+        
+        /* Hit effects */
+        .hit-effect {
+            position: absolute;
+            pointer-events: none;
+            animation: hitBurst 0.5s ease-out forwards;
+            z-index: 20;
+        }
+        
+        @keyframes hitBurst {
+            0% { transform: scale(0.5); opacity: 1; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+        
+        .hit-perfect {
+            width: 100px;
+            height: 100px;
+            border: 3px solid #ffd700;
+            border-radius: 50%;
+            box-shadow: 0 0 30px #ffd700, inset 0 0 30px #ffd700;
+        }
+        
+        .hit-great {
+            width: 80px;
+            height: 80px;
+            border: 3px solid #00d4ff;
+            border-radius: 50%;
+            box-shadow: 0 0 20px #00d4ff;
+        }
+        
+        .hit-good {
+            width: 60px;
+            height: 60px;
+            border: 3px solid #10b981;
+            border-radius: 50%;
+        }
+        
+        .hit-miss {
+            width: 50px;
+            height: 50px;
+            border: 2px solid #ef4444;
+            border-radius: 50%;
+            animation: missShake 0.3s ease-out;
+        }
+        
+        @keyframes missShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        
+        /* Judgment text */
+        .judgment {
+            position: absolute;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 36px;
+            font-weight: 900;
+            text-shadow: 0 0 20px currentColor;
+            pointer-events: none;
+            animation: judgmentFloat 0.8s ease-out forwards;
+            z-index: 30;
+        }
+        
+        @keyframes judgmentFloat {
+            0% { transform: translateY(0) scale(0.8); opacity: 1; }
+            100% { transform: translateY(-50px) scale(1.2); opacity: 0; }
+        }
+        
+        .judgment-perfect { color: #ffd700; text-shadow: 0 0 30px #ffd700; }
+        .judgment-great { color: #00d4ff; text-shadow: 0 0 20px #00d4ff; }
+        .judgment-good { color: #10b981; }
+        .judgment-miss { color: #ef4444; }
+        
+        /* UI Elements */
+        #ui {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            z-index: 100;
+        }
+        
+        .ui-panel {
+            background: rgba(10, 10, 15, 0.9);
+            border: 1px solid rgba(138, 43, 226, 0.5);
+            border-radius: 10px;
+            padding: 15px 25px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .score-display {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 32px;
+            font-weight: 900;
+            color: #ffd700;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+        
+        .combo-display {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 48px;
+            font-weight: 900;
+            color: #00d4ff;
+            text-shadow: 0 0 30px rgba(0, 212, 255, 0.6);
+        }
+        
+        .combo-label {
+            font-size: 14px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .accuracy-bar {
+            width: 200px;
+            height: 10px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        
+        .accuracy-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ef4444, #ffd700, #00d4ff);
+            transition: width 0.3s;
+        }
+        
+        .health-bar {
+            width: 300px;
+            height: 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+        
+        .health-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ef4444, #ffd700, #10b981);
+            transition: width 0.2s;
+            box-shadow: 0 0 20px currentColor;
+        }
+        
+        /* Progress bar */
+        #progressBar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: rgba(255,255,255,0.1);
+        }
+        
+        #progressFill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff006e, #00d4ff, #ffd700);
+            width: 0%;
+            transition: width 0.1s linear;
+            box-shadow: 0 0 20px #00d4ff;
+        }
+        
+        /* Start screen */
+        #startScreen {
+            position: absolute;
+            inset: 0;
+            background: rgba(10, 10, 15, 0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .game-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 72px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #ff006e, #00d4ff, #ffd700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 60px rgba(0, 212, 255, 0.5);
+            margin-bottom: 20px;
+            animation: titlePulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes titlePulse {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.3); }
+        }
+        
+        .subtitle {
+            font-size: 24px;
+            color: #888;
+            margin-bottom: 40px;
+            letter-spacing: 5px;
+        }
+        
+        .controls-info {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .key-box {
+            width: 60px;
+            height: 60px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            transition: all 0.3s;
+        }
+        
+        .key-q { border-color: #ff006e; color: #ff006e; box-shadow: 0 0 20px rgba(255, 0, 110, 0.3); }
+        .key-w { border-color: #00d4ff; color: #00d4ff; box-shadow: 0 0 20px rgba(0, 212, 255, 0.3); }
+        .key-s { border-color: #ffd700; color: #ffd700; box-shadow: 0 0 20px rgba(255, 215, 0, 0.3); }
+        .key-a { border-color: #8b5cf6; color: #8b5cf6; box-shadow: 0 0 20px rgba(139, 92, 246, 0.3); }
+        .key-d { border-color: #10b981; color: #10b981; box-shadow: 0 0 20px rgba(16, 185, 129, 0.3); }
+        
+        .btn-start {
+            padding: 20px 60px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ff006e, #00d4ff);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            box-shadow: 0 0 40px rgba(255, 0, 110, 0.5);
+        }
+        
+        .btn-start:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 60px rgba(0, 212, 255, 0.7);
+        }
+        
+        /* Results screen */
+        #resultsScreen {
+            position: absolute;
+            inset: 0;
+            background: rgba(10, 10, 15, 0.98);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .grade-display {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 150px;
+            font-weight: 900;
+            margin-bottom: 30px;
+            animation: gradePop 0.5s ease-out;
+        }
+        
+        @keyframes gradePop {
+            0% { transform: scale(0) rotate(-180deg); }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+        
+        .grade-SS { color: #ffd700; text-shadow: 0 0 60px #ffd700; }
+        .grade-S { color: #c0c0c0; text-shadow: 0 0 40px #c0c0c0; }
+        .grade-A { color: #ff6b35; text-shadow: 0 0 40px #ff6b35; }
+        .grade-B { color: #00d4ff; text-shadow: 0 0 40px #00d4ff; }
+        .grade-C { color: #8b5cf6; text-shadow: 0 0 40px #8b5cf6; }
+        .grade-D { color: #ef4444; text-shadow: 0 0 40px #ef4444; }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-box {
+            background: rgba(255,255,255,0.05);
+            padding: 20px 40px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .stat-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 36px;
+            font-weight: 900;
+            color: #00d4ff;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 5px;
+        }
+        
+        /* Key hints */
+        .key-hint {
+            position: absolute;
+            font-size: 12px;
+            color: rgba(255,255,255,0.5);
+            font-family: 'Orbitron', sans-serif;
+            pointer-events: none;
+        }
+        
+        #hint-q { top: 30px; left: 230px; }
+        #hint-w { top: 30px; right: 230px; }
+        #hint-s { top: 50%; left: 50%; transform: translate(-50%, -120%); }
+        #hint-a { bottom: 30px; left: 230px; }
+        #hint-d { bottom: 30px; right: 230px; }
+        
+        /* Lane lines (osu! style) */
+        .lane-line {
+            position: absolute;
+            width: 2px;
+            height: 100%;
+            background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.1), transparent);
+            pointer-events: none;
+        }
+        
+        .lane-UL { left: 239px; }
+        .lane-UR { right: 239px; }
+        .lane-C { left: 50%; transform: translateX(-50%); width: 4px; background: linear-gradient(to bottom, transparent, rgba(255,215,0,0.2), transparent); }
+        .lane-DL { left: 239px; }
+        .lane-DR { right: 239px; }
     </style>
 </head>
-<body class="antialiased">
-
-    <!-- NAVEGAÇÃO -->
-    <nav class="fixed top-0 w-full bg-neuro-bg/95 backdrop-blur-md border-b border-neuro-border z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16 items-center">
-                <div class="flex items-center gap-2">
-                    <div class="w-8 h-8 bg-gradient-to-br from-neuro-accent to-neuro-accent-hover rounded-lg flex items-center justify-center font-bold text-neuro-bg">N</div>
-                    <span class="font-semibold text-lg tracking-tight">NEURO: Academy <span class="text-neuro-accent">PRO</span></span>
-                </div>
-                <div class="hidden md:flex items-center gap-8">
-                    <a href="#curso" class="text-sm text-neuro-muted hover:text-neuro-text transition">Curso</a>
-                    <a href="#precos" class="text-sm text-neuro-muted hover:text-neuro-text transition">Preços</a>
-                    <button onclick="openAuthModal('login')" class="text-sm text-neuro-muted hover:text-neuro-text transition">Entrar</button>
-                    <button onclick="openAuthModal('register')" class="bg-neuro-accent hover:bg-neuro-accent-hover text-neuro-bg px-4 py-2 rounded-lg text-sm font-medium transition">Começar agora</button>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <!-- LANDING PAGE -->
-    <div id="landing-page">
-        <!-- HERO -->
-        <section class="pt-32 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-            <div class="text-center max-w-4xl mx-auto">
-                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-neuro-accent/10 border border-neuro-accent/20 text-neuro-accent text-xs font-medium mb-6">
-                    <span class="w-2 h-2 rounded-full bg-neuro-accent animate-pulse"></span>
-                    Turma inaugural - vagas limitadas
-                </div>
-                <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-6">
-                    Do <span class="gradient-text">ZERO</span> ao seu primeiro <br>
-                    RPG com Unity
-                </h1>
-                <p class="text-lg text-neuro-muted mb-8 max-w-2xl mx-auto leading-relaxed">
-                    Aprenda a criar jogos no universo NEURO: Verse. Do primeiro código à publicação, 
-                    com aulas práticas, projetos revisados e mentoria de quem já construiu o SANGUE DE TITÃ.
-                </p>
-                <div class="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-                    <button onclick="scrollToPricing()" class="bg-neuro-accent hover:bg-neuro-accent-hover text-neuro-bg px-8 py-4 rounded-xl font-semibold text-lg transition hover-lift">
-                        Ver planos e preços
-                    </button>
-                    <button onclick="openPreview()" class="border border-neuro-border hover:border-neuro-accent text-neuro-text px-8 py-4 rounded-xl font-semibold text-lg transition">
-                        Ver aula de demonstração
-                    </button>
-                </div>
-                <div class="flex items-center justify-center gap-8 text-sm text-neuro-muted">
-                    <div class="flex items-center gap-2">
-                        <svg class="w-5 h-5 text-neuro-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                        30 aulas práticas
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <svg class="w-5 h-5 text-neuro-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                        Projetos reais
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <svg class="w-5 h-5 text-neuro-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                        Certificado reconhecido
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- CURSO -->
-        <section id="curso" class="py-20 bg-neuro-card/30">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center mb-16">
-                    <h2 class="text-3xl font-bold mb-4">O que você vai construir</h2>
-                    <p class="text-neuro-muted max-w-2xl mx-auto">
-                        Três módulos progressivos. Do primeiro sprite ao RPG completo publicado.
-                    </p>
-                </div>
-                
-                <div class="grid md:grid-cols-3 gap-8">
-                    <!-- Módulo 1 -->
-                    <div class="bg-neuro-card border border-neuro-border rounded-2xl p-6 hover-lift">
-                        <div class="w-12 h-12 bg-neuro-accent/10 rounded-xl flex items-center justify-center mb-4">
-                            <span class="text-neuro-accent font-bold text-xl">01</span>
-                        </div>
-                        <h3 class="text-xl font-semibold mb-2">Fundamentos</h3>
-                        <p class="text-neuro-muted text-sm mb-4">Interface Unity, C# básico, sprites, animação 2D e movimentação.</p>
-                        <ul class="space-y-2 text-sm text-neuro-muted">
-                            <li class="flex items-center gap-2">
-                                <span class="w-1.5 h-1.5 rounded-full bg-neuro-accent"></span>
-                                10 aulas teórico-práticas
-                            </li>
-                            <li class="flex items-center gap-2">
-                                <span class="w-1.5 h-1.5 rounded-full bg-neuro-accent"></span>
-                                Projeto: Cena explorável
-                            </li>
-                        </ul>
-                    </div>
-
-                    <!-- Módulo 2 -->
-                    <div class="bg-neuro-card border border-neuro-border rounded-2xl p-6 hover-lift">
-                        <div class="w-12 h-12 bg-neuro-accent/10 rounded-xl flex items-center justify-center mb-4">
-                            <span class="text-neuro-accent font-bold text-xl">02</span>
-                        </div>
-                        <h3 class="text-xl font-semibold mb-2">Mecânicas de RPG</h3>
-                        <p class="text-neuro-muted text-sm mb-4">Batalha por turnos, inventário, quests, save/load e IA de inimigos.</p>
-                        <ul class="space-y-2 text-sm text-neuro-muted">
-                            <li class="flex items-center gap-2">
-                                <span class="w-1.5 h-1.5 rounded-full bg-neuro-accent"></span>
-                                10 aulas avançadas
-                            </li>
-                            <li class="flex items-center gap-2">
-                                <span class="w-1.5 h-1.5 rounded-full bg-neuro-accent"></span>
-                                Projeto: Demo de batalha
-                            </li>
-                        </ul>
-                    </div>
-
-                    <!-- Módulo 3 -->
-                    <div class="bg-neuro-card border border-neuro-border rounded-2xl p-6 hover-lift">
-                        <div class="w-12 h-12 bg-neuro-accent/10 rounded-xl flex items-center justify-center mb-4">
-                            <span class="text-neuro-accent font-bold text-xl">03</span>
-                        </div>
-                        <h3 class="text-xl font-semibold mb-2">Publicação</h3>
-                        <p class="text-neuro-muted text-sm mb-4">Polish, otimização, builds WebGL/Android e marketing indie.</p>
-                        <ul class="space-y-2 text-sm text-neuro-muted">
-                            <li class="flex items-center gap-2">
-                                <span class="w-1.5 h-1.5 rounded-full bg-neuro-accent"></span>
-                                10 aulas profissionais
-                            </li>
-                            <li class="flex items-center gap-2">
-                                <span class="w-1.5 h-1.5 rounded-full bg-neuro-accent"></span>
-                                Projeto: RPG publicado
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- PREÇOS -->
-        <section id="precos" class="py-20">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center mb-16">
-                    <h2 class="text-3xl font-bold mb-4">Invista na sua carreira</h2>
-                    <p class="text-neuro-muted">Acesso vitalício às aulas enquanto mantiver a assinatura ativa.</p>
-                </div>
-
-                <div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-                    <!-- Explorer -->
-                    <div class="bg-neuro-card border border-neuro-border rounded-2xl p-8 relative">
-                        <h3 class="text-xl font-semibold mb-2">Explorer</h3>
-                        <p class="text-neuro-muted text-sm mb-6">Para quem quer aprender no próprio ritmo</p>
-                        <div class="mb-6">
-                            <span class="text-4xl font-bold">R$ 19</span>
-                            <span class="text-neuro-muted">/mês</span>
-                        </div>
-                        <ul class="space-y-3 mb-8 text-sm text-neuro-muted">
-                            <li class="flex items-center gap-2">✓ Acesso a todas as 30 aulas</li>
-                            <li class="flex items-center gap-2">✓ Projetos para portfolio pessoal</li>
-                            <li class="flex items-center gap-2">✓ Certificado de conclusão</li>
-                            <li class="flex items-center gap-2">✓ Comunidade Discord</li>
-                        </ul>
-                        <button onclick="startCheckout('explorer')" class="w-full py-3 border border-neuro-border hover:border-neuro-accent rounded-lg font-medium transition text-neuro-text hover:text-neuro-accent">
-                            Escolher Explorer
-                        </button>
-                        <p class="text-xs text-neuro-muted mt-3 text-center">ou R$ 205/ano (10% off)</p>
-                    </div>
-
-                    <!-- Builder (Popular) -->
-                    <div class="bg-neuro-card border-2 border-neuro-accent rounded-2xl p-8 relative transform scale-105">
-                        <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-neuro-accent text-neuro-bg text-xs font-bold px-3 py-1 rounded-full">
-                            MAIS POPULAR
-                        </div>
-                        <h3 class="text-xl font-semibold mb-2">Builder</h3>
-                        <p class="text-neuro-muted text-sm mb-6">Para quem quer feedback e visibilidade</p>
-                        <div class="mb-6">
-                            <span class="text-4xl font-bold text-neuro-accent">R$ 39</span>
-                            <span class="text-neuro-muted">/mês</span>
-                        </div>
-                        <ul class="space-y-3 mb-8 text-sm text-neuro-muted">
-                            <li class="flex items-center gap-2">✓ Tudo do Explorer</li>
-                            <li class="flex items-center gap-2 text-neuro-text font-medium">✓ Revisão de código por instrutores</li>
-                            <li class="flex items-center gap-2 text-neuro-text font-medium">✓ Portfolio público na NEURO</li>
-                            <li class="flex items-center gap-2 text-neuro-text font-medium">✓ Acesso a engines alternativas</li>
-                        </ul>
-                        <button onclick="startCheckout('builder')" class="w-full py-3 bg-neuro-accent hover:bg-neuro-accent-hover text-neuro-bg rounded-lg font-semibold transition">
-                            Escolher Builder
-                        </button>
-                        <p class="text-xs text-neuro-muted mt-3 text-center">ou R$ 421/ano (10% off)</p>
-                    </div>
-
-                    <!-- Creator -->
-                    <div class="bg-neuro-card border border-neuro-border rounded-2xl p-8 relative">
-                        <h3 class="text-xl font-semibold mb-2">Creator</h3>
-                        <p class="text-neuro-muted text-sm mb-6">Para quem quer acelerar resultados</p>
-                        <div class="mb-6">
-                            <span class="text-4xl font-bold">R$ 79</span>
-                            <span class="text-neuro-muted">/mês</span>
-                        </div>
-                        <ul class="space-y-3 mb-8 text-sm text-neuro-muted">
-                            <li class="flex items-center gap-2">✓ Tudo do Builder</li>
-                            <li class="flex items-center gap-2 text-neuro-text font-medium">✓ Mentoria 1:1 (30min/mês)</li>
-                            <li class="flex items-center gap-2 text-neuro-text font-medium">✓ Prioridade em dúvidas</li>
-                            <li class="flex items-center gap-2 text-neuro-text font-medium">✓ Acesso antecipado a novos módulos</li>
-                        </ul>
-                        <button onclick="startCheckout('creator')" class="w-full py-3 border border-neuro-border hover:border-neuro-accent rounded-lg font-medium transition text-neuro-text hover:text-neuro-accent">
-                            Escolher Creator
-                        </button>
-                        <p class="text-xs text-neuro-muted mt-3 text-center">ou R$ 853/ano (10% off)</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </div>
-
-    <!-- APP AREA (escondida até login) -->
-    <div id="app-area" class="hidden min-h-screen pt-16">
-        <div class="flex h-[calc(100vh-4rem)]">
-            <!-- Sidebar -->
-            <aside class="w-64 bg-neuro-card border-r border-neuro-border hidden lg:block">
-                <div class="p-4">
-                    <div class="mb-6">
-                        <span class="text-xs font-semibold text-neuro-muted uppercase tracking-wider">Seu progresso</span>
-                        <div class="mt-2 h-2 bg-neuro-bg rounded-full overflow-hidden">
-                            <div id="progress-bar" class="h-full bg-neuro-accent w-0 transition-all duration-500"></div>
-                        </div>
-                        <span id="progress-text" class="text-xs text-neuro-muted mt-1">0% completo</span>
-                    </div>
-                    
-                    <nav class="space-y-1">
-                        <button onclick="showModule('modulo-1')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-neuro-bg transition text-sm font-medium text-neuro-text">
-                            Módulo 1: Fundamentos
-                        </button>
-                        <div id="lessons-mod-1" class="ml-4 space-y-1 hidden">
-                            <!-- Aulas geradas via JS -->
-                        </div>
-                        
-                        <button onclick="showModule('modulo-2')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-neuro-bg transition text-sm font-medium text-neuro-muted" disabled>
-                            Módulo 2: Mecânicas (bloqueado)
-                        </button>
-                        
-                        <button onclick="showModule('modulo-3')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-neuro-bg transition text-sm font-medium text-neuro-muted" disabled>
-                            Módulo 3: Publicação (bloqueado)
-                        </button>
-                    </nav>
-                </div>
-            </aside>
-
-            <!-- Conteúdo principal -->
-            <main class="flex-1 overflow-y-auto bg-neuro-bg">
-                <div id="lesson-container" class="max-w-4xl mx-auto p-8">
-                    <!-- Aula renderizada aqui -->
-                </div>
-            </main>
-        </div>
-    </div>
-
-    <!-- MODAL DE AUTH -->
-    <div id="auth-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-neuro-card border border-neuro-border rounded-2xl p-8 max-w-md w-full relative">
-            <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-neuro-muted hover:text-neuro-text">✕</button>
+<body>
+    <div id="gameContainer">
+        <!-- Background particles -->
+        <div id="particles"></div>
+        
+        <div id="playfield">
+            <!-- Lane lines -->
+            <div class="lane-line lane-UL"></div>
+            <div class="lane-line lane-UR"></div>
+            <div class="lane-line lane-C"></div>
             
-            <div id="auth-login">
-                <h2 class="text-2xl font-bold mb-6">Entrar na Academy</h2>
-                <form onsubmit="handleLogin(event)" class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium mb-2">Email</label>
-                        <input type="email" id="login-email" required class="w-full bg-neuro-bg border border-neuro-border rounded-lg px-4 py-3 text-neuro-text focus:border-neuro-accent focus:outline-none transition">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-2">Senha</label>
-                        <input type="password" id="login-password" required class="w-full bg-neuro-bg border border-neuro-border rounded-lg px-4 py-3 text-neuro-text focus:border-neuro-accent focus:outline-none transition">
-                    </div>
-                    <button type="submit" class="w-full bg-neuro-accent hover:bg-neuro-accent-hover text-neuro-bg py-3 rounded-lg font-semibold transition">
-                        Entrar
-                    </button>
-                </form>
-                <p class="mt-4 text-center text-sm text-neuro-muted">
-                    Não tem conta? <button onclick="toggleAuthMode()" class="text-neuro-accent hover:underline">Cadastre-se</button>
-                </p>
-            </div>
-
-            <div id="auth-register" class="hidden">
-                <h2 class="text-2xl font-bold mb-6">Criar conta</h2>
-                <form onsubmit="handleRegister(event)" class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium mb-2">Nome completo</label>
-                        <input type="text" id="reg-name" required class="w-full bg-neuro-bg border border-neuro-border rounded-lg px-4 py-3 text-neuro-text focus:border-neuro-accent focus:outline-none transition">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-2">Email</label>
-                        <input type="email" id="reg-email" required class="w-full bg-neuro-bg border border-neuro-border rounded-lg px-4 py-3 text-neuro-text focus:border-neuro-accent focus:outline-none transition">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-2">Senha (mínimo 6 caracteres)</label>
-                        <input type="password" id="reg-password" required minlength="6" class="w-full bg-neuro-bg border border-neuro-border rounded-lg px-4 py-3 text-neuro-text focus:border-neuro-accent focus:outline-none transition">
-                    </div>
-                    <button type="submit" class="w-full bg-neuro-accent hover:bg-neuro-accent-hover text-neuro-bg py-3 rounded-lg font-semibold transition">
-                        Criar conta gratuita
-                    </button>
-                </form>
-                <p class="mt-4 text-center text-sm text-neuro-muted">
-                    Já tem conta? <button onclick="toggleAuthMode()" class="text-neuro-accent hover:underline">Entrar</button>
-                </p>
+            <!-- Receptors (PUMP style) -->
+            <div class="receptor" id="receptor-UL" data-key="q"><span>↖</span></div>
+            <div class="receptor" id="receptor-UR" data-key="w"><span>↗</span></div>
+            <div class="receptor center" id="receptor-C" data-key="s"><span>●</span></div>
+            <div class="receptor" id="receptor-DL" data-key="a"><span>↙</span></div>
+            <div class="receptor" id="receptor-DR" data-key="d"><span>↘</span></div>
+            
+            <!-- Key hints -->
+            <div class="key-hint" id="hint-q">Q</div>
+            <div class="key-hint" id="hint-w">W</div>
+            <div class="key-hint" id="hint-s">S</div>
+            <div class="key-hint" id="hint-a">A</div>
+            <div class="key-hint" id="hint-d">D</div>
+            
+            <!-- Notes container -->
+            <div id="notesContainer"></div>
+            
+            <!-- Effects container -->
+            <div id="effectsContainer"></div>
+            
+            <!-- Progress bar -->
+            <div id="progressBar">
+                <div id="progressFill"></div>
             </div>
         </div>
-    </div>
-
-    <!-- MODAL DE PAGAMENTO (MOCK) -->
-    <div id="payment-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-neuro-card border border-neuro-border rounded-2xl p-8 max-w-md w-full text-center">
-            <div class="w-16 h-16 bg-neuro-accent/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span class="text-3xl">💳</span>
-            </div>
-            <h3 class="text-xl font-bold mb-2">Pagamento via Pix</h3>
-            <p class="text-neuro-muted mb-6">Escaneie o QR Code para ativar seu plano <span id="selected-tier" class="text-neuro-accent font-semibold"></span></p>
-            
-            <div class="bg-white p-4 rounded-lg mb-6 inline-block">
-                <div class="w-48 h-48 bg-gray-200 flex items-center justify-center text-gray-400 text-xs">
-                    [QR CODE PLACEHOLDER]<br>
-                    (Integrar Mercado Pago aqui)
+        
+        <!-- UI -->
+        <div id="ui">
+            <div class="ui-panel">
+                <div class="score-display" id="scoreDisplay">00000000</div>
+                <div class="accuracy-bar">
+                    <div class="accuracy-fill" id="accuracyFill" style="width: 100%"></div>
                 </div>
             </div>
             
-            <div class="space-y-2">
-                <button onclick="simulatePayment()" class="w-full bg-neuro-accent hover:bg-neuro-accent-hover text-neuro-bg py-3 rounded-lg font-semibold transition">
-                    Simular pagamento (teste)
-                </button>
-                <button onclick="closePaymentModal()" class="w-full border border-neuro-border hover:border-neuro-accent text-neuro-text py-3 rounded-lg transition">
-                    Cancelar
-                </button>
+            <div class="ui-panel" style="text-align: center;">
+                <div class="combo-display" id="comboDisplay">0</div>
+                <div class="combo-label">COMBO</div>
             </div>
+            
+            <div class="ui-panel">
+                <div class="health-bar">
+                    <div class="health-fill" id="healthFill" style="width: 100%"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Start Screen -->
+        <div id="startScreen">
+            <h1 class="game-title">NEURO: PULSE</h1>
+            <p class="subtitle">PUMP STYLE × OSU! PRECISION</p>
+            
+            <div class="controls-info">
+                <div class="key-box key-q">Q</div>
+                <div class="key-box key-w">W</div>
+                <div class="key-box key-s">S</div>
+                <div class="key-box key-a">A</div>
+                <div class="key-box key-d">D</div>
+            </div>
+            
+            <button class="btn-start" onclick="startGame()">INICIAR</button>
+        </div>
+        
+        <!-- Results Screen -->
+        <div id="resultsScreen">
+            <div class="grade-display" id="gradeDisplay">S</div>
+            
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-value" id="finalScore">0</div>
+                    <div class="stat-label">Pontuação</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="finalAccuracy">0%</div>
+                    <div class="stat-label">Precisão</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="finalCombo">0</div>
+                    <div class="stat-label">Max Combo</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="finalPerfect">0</div>
+                    <div class="stat-label">Perfects</div>
+                </div>
+            </div>
+            
+            <button class="btn-start" onclick="restartGame()">JOGAR NOVAMENTE</button>
         </div>
     </div>
 
     <script>
-        // ===== ESTADO GLOBAL =====
-        let currentUser = null;
-        let selectedTier = null;
-        
-        // ===== DADOS DAS AULAS (Template para você preencher) =====
-        const courseData = {
-            "modulo-1": {
-                title: "Fundamentos",
-                lessons: [
-                    {
-                        id: "aula-1",
-                        title: "Bem-vindo à NEURO: Academy",
-                        content: `
-## Bem-vindo à NEURO: Academy PRO
-
-Esta é a **Aula 1** do Módulo 1. Substitua este conteúdo pelo seu roteiro completo.
-
-### O que você vai aprender nesta aula:
-
-- Apresentação do curso e metodologia
-- Visão geral do universo NEURO: Verse
-- Configuração do ambiente de desenvolvimento
-
-### Conteúdo principal
-
-Aqui vai seu texto explicativo. Você pode usar:
-- **Negrito** para ênfase
-- *Itálico* para termos técnicos
-- Listas organizadas
-
-![Diagrama explicativo](https://via.placeholder.com/800x400/1a1a1f/00d4aa?text=Seu+Diagrama+Aqui)
-
-### Código de exemplo
-
-\`\`\`csharp
-using UnityEngine;
-
-public class PlayerMovement : MonoBehaviour 
-{
-    void Update() 
-    {
-        // Seu código aqui
-        float horizontal = Input.GetAxis("Horizontal");
-        Debug.Log("Movimento: " + horizontal);
-    }
-}
-\`\`\`
-
-<div class="callout">
-<strong>Dica profissional:</strong> Sempre mantenha seu código organizado com comentários claros.
-</div>
-                        `,
-                        quiz: [
-                            {
-                                question: "Qual engine principal utilizamos no curso?",
-                                options: ["Unreal Engine", "Unity", "Godot", "GameMaker"],
-                                correct: 1,
-                                explanation: "O curso foca em Unity 2D por ser a engine mais versátil para jogos indie no mercado brasileiro."
-                            },
-                            {
-                                question: "Qual linguagem de programação usamos?",
-                                options: ["Python", "JavaScript", "C#", "C++"],
-                                correct: 2,
-                                explanation: "Unity utiliza C# como linguagem principal para scripts."
-                            },
-                            {
-                                question: "O que é o NEURO: Verse?",
-                                options: ["Um motor de jogos", "Um universo de jogos interconectados", "Uma linguagem de programação", "Uma ferramenta de arte"],
-                                correct: 1,
-                                explanation: "NEURO: Verse é o universo compartilhado onde seus jogos existem, conectando-se a títulos como SANGUE DE TITÃ."
-                            }
-                        ]
-                    },
-                    {
-                        id: "aula-2",
-                        title: "Instalação e Interface do Unity",
-                        content: "<p>Conteúdo da aula 2...</p>",
-                        quiz: []
-                    }
-                    // Adicione mais aulas aqui
-                ]
-            }
+        // Game state
+        let gameState = {
+            isPlaying: false,
+            score: 0,
+            combo: 0,
+            maxCombo: 0,
+            health: 100,
+            accuracy: 100,
+            perfects: 0,
+            greats: 0,
+            goods: 0,
+            misses: 0,
+            totalNotes: 0,
+            startTime: 0,
+            bpm: 128
         };
-
-        // ===== FUNÇÕES DE UI =====
-        function openAuthModal(mode) {
-            document.getElementById('auth-modal').classList.remove('hidden');
-            if (mode === 'register') {
-                document.getElementById('auth-login').classList.add('hidden');
-                document.getElementById('auth-register').classList.remove('hidden');
-            } else {
-                document.getElementById('auth-login').classList.remove('hidden');
-                document.getElementById('auth-register').classList.add('hidden');
+        
+        // Note positions (matching PUMP layout)
+        const notePositions = {
+            'UL': { x: 200, y: 50, key: 'q', label: '↖' },
+            'UR': { x: 520, y: 50, key: 'w', label: '↗' },
+            'C': { x: 355, y: 260, key: 's', label: '●', isCenter: true },
+            'DL': { x: 200, y: 470, key: 'a', label: '↙' },
+            'DR': { x: 520, y: 470, key: 'd', label: '↘' }
+        };
+        
+        // Timing windows (osu! style - in milliseconds)
+        const timingWindows = {
+            perfect: 45,  // Marvellous
+            great: 90,    // Perfect  
+            good: 135,    // Great
+            miss: 180     // Miss
+        };
+        
+        let notes = [];
+        let noteIdCounter = 0;
+        let gameLoopId;
+        let spawnIntervalId;
+        let audioContext;
+        
+        // Initialize particles
+        function createParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 10 + 's';
+                particle.style.animationDuration = (10 + Math.random() * 10) + 's';
+                container.appendChild(particle);
             }
         }
-
-        function closeAuthModal() {
-            document.getElementById('auth-modal').classList.add('hidden');
+        
+        // Audio synthesis (Web Audio API)
+        function initAudio() {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
         }
-
-        function toggleAuthMode() {
-            document.getElementById('auth-login').classList.toggle('hidden');
-            document.getElementById('auth-register').classList.toggle('hidden');
-        }
-
-        function scrollToPricing() {
-            document.getElementById('precos').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        function openPreview() {
-            alert('Aula de demonstração será implementada na próxima parte');
-        }
-
-        // ===== AUTENTICAÇÃO (MOCK - substituir por Firebase) =====
-        function handleLogin(e) {
-            e.preventDefault();
-            const email = document.getElementById('login-email').value;
+        
+        function playHitSound(type) {
+            if (!audioContext) return;
             
-            // Simulação de login
-            currentUser = {
-                name: "Aluno Teste",
-                email: email,
-                tier: "builder",
-                completedLessons: [],
-                currentLesson: "aula-1"
-            };
+            const osc = audioContext.createOscillator();
+            const gain = audioContext.createGain();
             
-            closeAuthModal();
-            showApp();
-        }
-
-        function handleRegister(e) {
-            e.preventDefault();
-            const name = document.getElementById('reg-name').value;
-            const email = document.getElementById('reg-email').value;
+            osc.connect(gain);
+            gain.connect(audioContext.destination);
             
-            // Simulação de registro
-            currentUser = {
-                name: name,
-                email: email,
-                tier: "free",
-                completedLessons: [],
-                currentLesson: null
-            };
+            const now = audioContext.currentTime;
             
-            closeAuthModal();
-            alert('Conta criada! Escolha um plano para começar.');
-            scrollToPricing();
-        }
-
-        // ===== PAGAMENTO =====
-        function startCheckout(tier) {
-            if (!currentUser) {
-                openAuthModal('register');
-                return;
+            switch(type) {
+                case 'perfect':
+                    osc.frequency.setValueAtTime(880, now);
+                    osc.frequency.exponentialRampToValueAtTime(1760, now + 0.1);
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                    break;
+                case 'great':
+                    osc.frequency.setValueAtTime(660, now);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+                    break;
+                case 'good':
+                    osc.frequency.setValueAtTime(440, now);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+                    break;
+                case 'miss':
+                    osc.frequency.setValueAtTime(150, now);
+                    osc.frequency.exponentialRampToValueAtTime(100, now + 0.2);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                    break;
             }
             
-            selectedTier = tier;
-            document.getElementById('selected-tier').textContent = tier.toUpperCase();
-            document.getElementById('payment-modal').classList.remove('hidden');
+            osc.start(now);
+            osc.stop(now + 0.3);
         }
-
-        function closePaymentModal() {
-            document.getElementById('payment-modal').classList.add('hidden');
-        }
-
-        function simulatePayment() {
-            // Simulação de pagamento aprovado
-            currentUser.tier = selectedTier;
-            closePaymentModal();
-            showApp();
-            alert(`Pagamento simulado! Bem-vindo ao plano ${selectedTier.toUpperCase()}.`);
-        }
-
-        // ===== APP PRINCIPAL =====
-        function showApp() {
-            document.getElementById('landing-page').classList.add('hidden');
-            document.getElementById('app-area').classList.remove('hidden');
+        
+        // Spawn note with osu! approach circle
+        function spawnNote(lane) {
+            const container = document.getElementById('notesContainer');
+            const pos = notePositions[lane];
+            const id = noteIdCounter++;
             
-            // Renderiza sidebar
-            renderSidebar();
-            
-            // Mostra primeira aula ou atual
-            const lessonId = currentUser.currentLesson || 'aula-1';
-            loadLesson(lessonId);
-        }
-
-        function renderSidebar() {
-            const container = document.getElementById('lessons-mod-1');
-            const modulo = courseData['modulo-1'];
-            
-            container.innerHTML = modulo.lessons.map((lesson, index) => `
-                <button onclick="loadLesson('${lesson.id}')" 
-                        class="w-full text-left px-3 py-2 rounded text-sm ${currentUser.completedLessons.includes(lesson.id) ? 'text-neuro-accent' : 'text-neuro-muted'} hover:text-neuro-text transition">
-                    ${index + 1}. ${lesson.title}
-                </button>
-            `).join('');
-            
-            container.classList.remove('hidden');
-        }
-
-        function loadLesson(lessonId) {
-            const lesson = courseData['modulo-1'].lessons.find(l => l.id === lessonId);
-            if (!lesson) return;
-            
-            const container = document.getElementById('lesson-container');
-            
-            // Renderiza conteúdo Markdown
-            const htmlContent = marked.parse(lesson.content);
-            
-            // Renderiza quiz se existir
-            let quizHtml = '';
-            if (lesson.quiz && lesson.quiz.length > 0) {
-                quizHtml = `
-                    <div class="mt-12 pt-8 border-t border-neuro-border">
-                        <h3 class="text-xl font-semibold mb-6">Verificação de aprendizado</h3>
-                        <div id="quiz-container" class="space-y-6">
-                            ${lesson.quiz.map((q, idx) => `
-                                <div class="quiz-question" data-question="${idx}">
-                                    <p class="font-medium mb-3">${idx + 1}. ${q.question}</p>
-                                    <div class="space-y-2">
-                                        ${q.options.map((opt, optIdx) => `
-                                            <div class="quiz-option p-3 rounded-lg border border-neuro-border cursor-pointer" 
-                                                 onclick="selectOption(${idx}, ${optIdx}, ${q.correct})">
-                                                ${String.fromCharCode(97 + optIdx)}) ${opt}
-                                            </div>
-                                        `).join('')}
-                                    </div>
-                                    <div class="explanation hidden mt-3 p-3 rounded-lg bg-neuro-card text-sm"></div>
-                                </div>
-                            `).join('')}
-                        </div>
-                        <button onclick="checkQuiz()" class="mt-6 bg-neuro-accent hover:bg-neuro-accent-hover text-neuro-bg px-6 py-3 rounded-lg font-semibold transition">
-                            Verificar respostas
-                        </button>
-                    </div>
-                `;
-            }
-            
-            container.innerHTML = `
-                <article class="lesson-content">
-                    <header class="mb-8">
-                        <span class="text-neuro-accent text-sm font-medium">Módulo 1 • Aula ${lesson.id.split('-')[1]}</span>
-                        <h1 class="text-3xl font-bold mt-2 mb-4">${lesson.title}</h1>
-                        <div class="flex items-center gap-4 text-sm text-neuro-muted">
-                            <span>15-20 minutos de leitura</span>
-                            <span>•</span>
-                            <span>1 exercício prático</span>
-                        </div>
-                    </header>
-                    
-                    ${htmlContent}
-                    ${quizHtml}
-                    
-                    <div class="mt-12 flex justify-between items-center pt-8 border-t border-neuro-border">
-                        <button onclick="prevLesson()" class="text-neuro-muted hover:text-neuro-text transition">← Aula anterior</button>
-                        <button onclick="completeLesson('${lessonId}')" class="bg-neuro-accent hover:bg-neuro-accent-hover text-neuro-bg px-6 py-3 rounded-lg font-semibold transition">
-                            Marcar como concluída →
-                        </button>
-                    </div>
-                </article>
+            // Create approach circle (osu! style)
+            const approach = document.createElement('div');
+            approach.className = `approach-circle ${pos.isCenter ? 'center' : ''}`;
+            approach.style.cssText = `
+                width: ${pos.isCenter ? 90 : 80}px;
+                height: ${pos.isCenter ? 90 : 80}px;
+                left: ${pos.x}px;
+                top: ${pos.y}px;
+                border-color: ${getLaneColor(lane)};
+                transform: translate(-50%, -50%);
             `;
+            container.appendChild(approach);
             
-            // Aplica syntax highlight
-            Prism.highlightAll();
+            // Create note
+            const noteEl = document.createElement('div');
+            noteEl.className = `note note-${lane} ${pos.isCenter ? 'center' : ''}`;
+            noteEl.id = `note-${id}`;
+            noteEl.style.cssText = `
+                left: ${pos.x}px;
+                top: ${pos.y}px;
+                transform: translate(-50%, -50%);
+            `;
+            noteEl.innerHTML = `<span style="${pos.isCenter ? '' : `display: inline-block; transform: rotate(${lane === 'UL' || lane === 'DR' ? '45' : '-45'}deg)`}">${pos.label}</span>`;
+            
+            container.appendChild(noteEl);
+            
+            const note = {
+                id: id,
+                lane: lane,
+                spawnTime: Date.now(),
+                hitTime: Date.now() + 1000, // 1 second approach time
+                element: noteEl,
+                approach: approach,
+                hit: false
+            };
+            
+            notes.push(note);
+            gameState.totalNotes++;
         }
-
-        // ===== QUIZ =====
-        let selectedAnswers = {};
-
-        function selectOption(questionIdx, optionIdx, correctIdx) {
-            const questionEl = document.querySelectorAll('.quiz-question')[questionIdx];
-            const options = questionEl.querySelectorAll('.quiz-option');
-            
-            // Remove seleção anterior
-            options.forEach(opt => opt.classList.remove('selected'));
-            
-            // Adiciona seleção atual
-            options[optionIdx].classList.add('selected');
-            selectedAnswers[questionIdx] = { selected: optionIdx, correct: correctIdx };
+        
+        function getLaneColor(lane) {
+            const colors = {
+                'UL': '#ff006e',
+                'UR': '#00d4ff',
+                'C': '#ffd700',
+                'DL': '#8b5cf6',
+                'DR': '#10b981'
+            };
+            return colors[lane];
         }
-
-        function checkQuiz() {
-            const questions = document.querySelectorAll('.quiz-question');
-            let correct = 0;
+        
+        // Game loop
+        function gameLoop() {
+            if (!gameState.isPlaying) return;
             
-            questions.forEach((q, idx) => {
-                const answer = selectedAnswers[idx];
-                const options = q.querySelectorAll('.quiz-option');
-                const explanation = q.querySelector('.explanation');
-                const questionData = courseData['modulo-1'].lessons.find(l => l.id === 'aula-1').quiz[idx];
+            const now = Date.now();
+            
+            // Check for missed notes
+            notes.forEach((note, index) => {
+                if (note.hit) return;
                 
-                if (!answer) return;
+                const timeDiff = now - note.hitTime;
                 
-                options[answer.selected].classList.remove('selected');
-                
-                if (answer.selected === answer.correct) {
-                    options[answer.selected].classList.add('correct');
-                    explanation.className = 'explanation mt-3 p-3 rounded-lg bg-neuro-accent/10 text-neuro-accent text-sm';
-                    explanation.textContent = '✓ Correto! ' + questionData.explanation;
-                    correct++;
-                } else {
-                    options[answer.selected].classList.add('wrong');
-                    options[answer.correct].classList.add('correct');
-                    explanation.className = 'explanation mt-3 p-3 rounded-lg bg-red-500/10 text-red-400 text-sm';
-                    explanation.textContent = '✗ ' + questionData.explanation;
+                if (timeDiff > timingWindows.miss) {
+                    // Miss
+                    showJudgment('miss', note.lane);
+                    createHitEffect('miss', note.lane);
+                    playHitSound('miss');
+                    handleMiss();
+                    removeNote(index);
                 }
-                
-                explanation.classList.remove('hidden');
             });
             
-            if (correct >= 2) {
-                setTimeout(() => alert(`Você acertou ${correct}/3! Pode prosseguir para a próxima aula.`), 100);
-            } else {
-                alert(`Você acertou ${correct}/3. Recomendamos revisar o conteúdo antes de continuar.`);
-            }
-        }
-
-        function completeLesson(lessonId) {
-            if (!currentUser.completedLessons.includes(lessonId)) {
-                currentUser.completedLessons.push(lessonId);
-                updateProgress();
-            }
-            alert('Aula concluída! Progresso salvo.');
-        }
-
-        function updateProgress() {
-            const total = 30; // Total de aulas
-            const completed = currentUser.completedLessons.length;
-            const percent = Math.round((completed / total) * 100);
+            // Update progress
+            const progress = Math.min(100, ((now - gameState.startTime) / 60000) * 100);
+            document.getElementById('progressFill').style.width = progress + '%';
             
-            document.getElementById('progress-bar').style.width = percent + '%';
-            document.getElementById('progress-text').textContent = percent + '% completo';
+            // Check game over
+            if (gameState.health <= 0) {
+                endGame();
+            }
+            
+            gameLoopId = requestAnimationFrame(gameLoop);
         }
-
-        function prevLesson() {
-            alert('Navegação entre aulas será implementada na próxima parte');
+        
+        // Handle input
+        function handleInput(lane) {
+            if (!gameState.isPlaying) return;
+            
+            const now = Date.now();
+            const receptor = document.getElementById(`receptor-${lane}`);
+            
+            // Visual feedback
+            receptor.classList.add('active');
+            setTimeout(() => receptor.classList.remove('active'), 100);
+            
+            // Find closest note in this lane
+            const laneNotes = notes.filter(n => n.lane === lane && !n.hit);
+            if (laneNotes.length === 0) return;
+            
+            const closestNote = laneNotes.reduce((closest, note) => {
+                const closestDiff = Math.abs(now - closest.hitTime);
+                const noteDiff = Math.abs(now - note.hitTime);
+                return noteDiff < closestDiff ? note : closest;
+            });
+            
+            const timeDiff = Math.abs(now - closestNote.hitTime);
+            
+            // Judge timing
+            let judgment = 'miss';
+            if (timeDiff <= timingWindows.perfect) judgment = 'perfect';
+            else if (timeDiff <= timingWindows.great) judgment = 'great';
+            else if (timeDiff <= timingWindows.good) judgment = 'good';
+            
+            if (judgment !== 'miss') {
+                closestNote.hit = true;
+                showJudgment(judgment, lane);
+                createHitEffect(judgment, lane);
+                playHitSound(judgment);
+                handleHit(judgment);
+                removeNote(notes.indexOf(closestNote));
+            }
         }
-
-        function showModule(modId) {
-            // Implementar troca de módulo
+        
+        function handleHit(judgment) {
+            const multipliers = { perfect: 1, great: 0.8, good: 0.5 };
+            const baseScore = 300;
+            
+            gameState.combo++;
+            if (gameState.combo > gameState.maxCombo) gameState.maxCombo = gameState.combo;
+            
+            const comboMultiplier = 1 + (Math.floor(gameState.combo / 10) * 0.1);
+            const points = Math.floor(baseScore * multipliers[judgment] * comboMultiplier);
+            
+            gameState.score += points;
+            
+            // Update counters
+            if (judgment === 'perfect') gameState.perfects++;
+            else if (judgment === 'great') gameState.greats++;
+            else if (judgment === 'good') gameState.goods++;
+            
+            // Health
+            gameState.health = Math.min(100, gameState.health + (judgment === 'perfect' ? 2 : 1));
+            
+            updateUI();
         }
-
-        // ===== INICIALIZAÇÃO =====
-        document.addEventListener('DOMContentLoaded', () => {
-            // Verifica se usuário está logado (simulação)
-            // Na versão real: firebase.auth().onAuthStateChanged()
+        
+        function handleMiss() {
+            gameState.combo = 0;
+            gameState.misses++;
+            gameState.health = Math.max(0, gameState.health - 10);
+            updateUI();
+        }
+        
+        function updateUI() {
+            document.getElementById('scoreDisplay').textContent = gameState.score.toString().padStart(8, '0');
+            document.getElementById('comboDisplay').textContent = gameState.combo;
+            document.getElementById('healthFill').style.width = gameState.health + '%';
+            
+            // Calculate accuracy
+            const hitNotes = gameState.perfects + gameState.greats + gameState.goods;
+            const totalJudged = hitNotes + gameState.misses;
+            const accuracy = totalJudged > 0 ? (hitNotes / totalJudged) * 100 : 100;
+            gameState.accuracy = accuracy;
+            document.getElementById('accuracyFill').style.width = accuracy + '%';
+        }
+        
+        function showJudgment(type, lane) {
+            const container = document.getElementById('effectsContainer');
+            const pos = notePositions[lane];
+            
+            const judgment = document.createElement('div');
+            judgment.className = `judgment judgment-${type}`;
+            judgment.textContent = type.toUpperCase();
+            judgment.style.cssText = `
+                left: ${pos.x}px;
+                top: ${pos.y - 50}px;
+                transform: translateX(-50%);
+            `;
+            
+            container.appendChild(judgment);
+            setTimeout(() => judgment.remove(), 800);
+        }
+        
+        function createHitEffect(type, lane) {
+            const container = document.getElementById('effectsContainer');
+            const pos = notePositions[lane];
+            
+            const effect = document.createElement('div');
+            effect.className = `hit-effect hit-${type}`;
+            effect.style.cssText = `
+                left: ${pos.x}px;
+                top: ${pos.y}px;
+                transform: translate(-50%, -50%);
+            `;
+            
+            container.appendChild(effect);
+            setTimeout(() => effect.remove(), 500);
+        }
+        
+        function removeNote(index) {
+            if (index >= 0 && index < notes.length) {
+                const note = notes[index];
+                if (note.element) note.element.remove();
+                if (note.approach) note.approach.remove();
+                notes.splice(index, 1);
+            }
+        }
+        
+        // Note spawning patterns
+        function startSpawning() {
+            const lanes = ['UL', 'UR', 'C', 'DL', 'DR'];
+            let patternIndex = 0;
+            
+            // Predefined patterns (PUMP style)
+            const patterns = [
+                ['C'], ['UL', 'DR'], ['UR', 'DL'], ['C'],
+                ['UL', 'UR'], ['DL', 'DR'], ['C'],
+                ['UL', 'C', 'DR'], ['UR', 'C', 'DL'],
+                ['UL', 'UR', 'DL', 'DR'], ['C'],
+                ['UL', 'UR', 'C', 'DL', 'DR']
+            ];
+            
+            spawnIntervalId = setInterval(() => {
+                if (!gameState.isPlaying) return;
+                
+                const pattern = patterns[patternIndex % patterns.length];
+                pattern.forEach((lane, i) => {
+                    setTimeout(() => spawnNote(lane), i * 100);
+                });
+                
+                patternIndex++;
+            }, 500); // Spawn every 500ms (128 BPM feel)
+        }
+        
+        function startGame() {
+            initAudio();
+            document.getElementById('startScreen').style.display = 'none';
+            
+            // Reset state
+            gameState = {
+                isPlaying: true,
+                score: 0,
+                combo: 0,
+                maxCombo: 0,
+                health: 100,
+                accuracy: 100,
+                perfects: 0,
+                greats: 0,
+                goods: 0,
+                misses: 0,
+                totalNotes: 0,
+                startTime: Date.now(),
+                bpm: 128
+            };
+            
+            notes = [];
+            noteIdCounter = 0;
+            
+            // Clear containers
+            document.getElementById('notesContainer').innerHTML = '';
+            document.getElementById('effectsContainer').innerHTML = '';
+            
+            updateUI();
+            gameLoop();
+            startSpawning();
+            
+            // Auto-end after 60 seconds
+            setTimeout(endGame, 60000);
+        }
+        
+        function endGame() {
+            gameState.isPlaying = false;
+            clearInterval(spawnIntervalId);
+            cancelAnimationFrame(gameLoopId);
+            
+            // Calculate grade
+            const hitNotes = gameState.perfects + gameState.greats + gameState.goods;
+            const total = hitNotes + gameState.misses;
+            const accuracy = total > 0 ? (hitNotes / total) * 100 : 0;
+            
+            let grade = 'D';
+            if (accuracy >= 95 && gameState.misses === 0) grade = 'SS';
+            else if (accuracy >= 90) grade = 'S';
+            else if (accuracy >= 80) grade = 'A';
+            else if (accuracy >= 70) grade = 'B';
+            else if (accuracy >= 60) grade = 'C';
+            
+            // Show results
+            document.getElementById('gradeDisplay').textContent = grade;
+            document.getElementById('gradeDisplay').className = `grade-display grade-${grade}`;
+            document.getElementById('finalScore').textContent = gameState.score.toLocaleString();
+            document.getElementById('finalAccuracy').textContent = accuracy.toFixed(1) + '%';
+            document.getElementById('finalCombo').textContent = gameState.maxCombo;
+            document.getElementById('finalPerfect').textContent = gameState.perfects;
+            
+            document.getElementById('resultsScreen').style.display = 'flex';
+        }
+        
+        function restartGame() {
+            document.getElementById('resultsScreen').style.display = 'none';
+            startGame();
+        }
+        
+        // Keyboard input
+        document.addEventListener('keydown', (e) => {
+            if (e.repeat) return;
+            
+            const keyMap = {
+                'q': 'UL', 'Q': 'UL',
+                'w': 'UR', 'W': 'UR',
+                's': 'C', 'S': 'C',
+                'a': 'DL', 'A': 'DL',
+                'd': 'DR', 'D': 'DR',
+                '7': 'UL', '9': 'UR', '5': 'C', '1': 'DL', '3': 'DR' // Numpad style
+            };
+            
+            if (keyMap[e.key]) {
+                e.preventDefault();
+                handleInput(keyMap[e.key]);
+            }
         });
+        
+        // Mouse/touch input
+        Object.keys(notePositions).forEach(lane => {
+            const receptor = document.getElementById(`receptor-${lane}`);
+            receptor.addEventListener('mousedown', () => handleInput(lane));
+            receptor.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                handleInput(lane);
+            });
+        });
+        
+        // Initialize
+        createParticles();
     </script>
 </body>
 </html>
